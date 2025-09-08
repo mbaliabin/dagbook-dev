@@ -9,7 +9,7 @@ import AddWorkoutModal from '../components/AddWorkoutModal'
 import { Workout } from '../components/RecentWorkouts'
 
 interface Props {
-  workouts: Workout[]
+  workouts?: Workout[] // теперь опционально
   name: string
   loadingProfile: boolean
   loadingWorkouts: boolean
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export default function ProfilePageMobile({
-  workouts,
+  workouts = [], // дефолтный пустой массив
   name,
   loadingProfile,
   loadingWorkouts,
@@ -181,4 +181,5 @@ export default function ProfilePageMobile({
     </div>
   )
 }
+
 
