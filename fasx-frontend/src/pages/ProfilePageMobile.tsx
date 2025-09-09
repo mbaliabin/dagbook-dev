@@ -1,7 +1,10 @@
 import React from "react"
 import { Timer, MapPin, Zap, Target, Plus, LogOut } from "lucide-react"
+import TrainingLoadChartMobile from "../components/TrainingLoadChartMobile"
 
 interface Workout {
+  date?: string
+  distance?: number | null
   zone1Min?: number
   zone2Min?: number
   zone3Min?: number
@@ -14,7 +17,6 @@ interface IntensityZonesMobileProps {
 }
 
 function IntensityZonesMobile({ workouts }: IntensityZonesMobileProps) {
-  // Суммируем минуты по зонам
   const totalZones = [0, 0, 0, 0, 0]
   workouts.forEach(w => {
     totalZones[0] += w.zone1Min || 0
@@ -29,15 +31,15 @@ function IntensityZonesMobile({ workouts }: IntensityZonesMobileProps) {
   return (
     <div className="flex gap-1 overflow-x-auto mt-2">
       {totalZones.map((minutes, i) => (
-        <div key={i} className="flex flex-col items-center min-w-[40px]">
+        <div key={i} className="flex flex-col items-center min-w-[30px]">
           <div
-            className="w-6 rounded-full mb-1"
+            className="w-5 rounded-full mb-1"
             style={{
-              height: `${Math.min(minutes, 60)}px`, // пропорциональная высота
+              height: `${Math.min(minutes, 60)}px`,
               backgroundColor: colors[i]
             }}
           />
-          <span className="text-xs text-gray-300">I{i + 1}</span>
+          <span className="text-[10px] text-gray-300">I{i + 1}</span>
         </div>
       ))}
     </div>
@@ -45,10 +47,9 @@ function IntensityZonesMobile({ workouts }: IntensityZonesMobileProps) {
 }
 
 export default function ProfilePageMobile() {
-  // Пример данных
   const workouts: Workout[] = [
-    { zone1Min: 10, zone2Min: 20, zone3Min: 15, zone4Min: 5, zone5Min: 0 },
-    { zone1Min: 5, zone2Min: 15, zone3Min: 20, zone4Min: 10, zone5Min: 5 },
+    { date: "2025-09-01", distance: 5, zone1Min: 10, zone2Min: 20, zone3Min: 15, zone4Min: 5, zone5Min: 0 },
+    { date: "2025-09-02", distance: 10, zone1Min: 5, zone2Min: 15, zone3Min: 20, zone4Min: 10, zone5Min: 5 },
   ]
 
   return (
@@ -102,7 +103,10 @@ export default function ProfilePageMobile() {
         </div>
       </div>
 
-      {/* Intensity Zones мобильная версия */}
+      {/* График нагрузки */}
+      <TrainingLoadChartMobile workouts={workouts} />
+
+      {/* Intensity Zones */}
       <IntensityZonesMobile workouts={workouts} />
 
       {/* Последние тренировки */}
@@ -126,6 +130,7 @@ export default function ProfilePageMobile() {
     </div>
   )
 }
+
 
 
 
