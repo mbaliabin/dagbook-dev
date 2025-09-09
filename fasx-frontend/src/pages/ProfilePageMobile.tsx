@@ -149,21 +149,21 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0e0e10] text-white px-4 py-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-[#0e0e10] text-white px-2 sm:px-4 py-6 overflow-x-hidden">
+      <div className="w-full max-w-7xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="flex items-center space-x-4">
             <img
               src="/profile.jpg"
               alt="Avatar"
-              className="w-16 h-16 rounded-full object-cover"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
             />
             <div>
-              <h1 className="text-2xl font-bold text-white">
+              <h1 className="text-xl sm:text-2xl font-bold text-white">
                 {loadingProfile ? 'Загрузка...' : name}
               </h1>
-              <p className="text-sm text-white">
+              <p className="text-xs sm:text-sm text-white">
                 {!dateRange
                   ? selectedMonth.format('MMMM YYYY')
                   : `${dayjs(dateRange.startDate).format('DD MMM YYYY')} — ${dayjs(dateRange.endDate).format('DD MMM YYYY')}`
@@ -172,16 +172,16 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded flex items-center"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded flex items-center justify-center"
             >
               <Plus className="w-4 h-4 mr-1" /> Добавить тренировку
             </button>
             <button
               onClick={handleLogout}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-1 rounded flex items-center"
+              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded flex items-center justify-center"
             >
               <LogOut className="w-4 h-4 mr-1" /> Выйти
             </button>
@@ -189,9 +189,9 @@ export default function ProfilePage() {
         </div>
 
         {/* Выбор периода */}
-        <div className="flex items-center space-x-2 flex-wrap">
+        <div className="flex flex-wrap items-center gap-2">
           <button
-            className="flex items-center text-sm text-gray-300 bg-[#1f1f22] px-3 py-1 rounded hover:bg-[#2a2a2d]"
+            className="flex items-center text-sm text-gray-300 bg-[#1f1f22] px-2 py-1 rounded hover:bg-[#2a2a2d]"
             onClick={onPrevMonth}
           >
             <ChevronLeft className="w-4 h-4" />
@@ -209,7 +209,7 @@ export default function ProfilePage() {
           </div>
 
           <button
-            className="text-sm text-gray-300 bg-[#1f1f22] px-3 py-1 rounded hover:bg-[#2a2a2d]"
+            className="text-sm text-gray-300 bg-[#1f1f22] px-2 py-1 rounded hover:bg-[#2a2a2d]"
             onClick={onNextMonth}
           >
             <ChevronRight className="w-4 h-4" />
@@ -231,7 +231,7 @@ export default function ProfilePage() {
           <div className="relative">
             <button
               onClick={() => setShowDateRangePicker(prev => !prev)}
-              className="ml-2 text-sm px-3 py-1 rounded border border-gray-600 bg-[#1f1f22] text-gray-300 hover:bg-[#2a2a2d] flex items-center"
+              className="text-sm px-3 py-1 rounded border border-gray-600 bg-[#1f1f22] text-gray-300 hover:bg-[#2a2a2d] flex items-center"
             >
               <Calendar className="w-4 h-4 mr-1" />
               Произвольный период
@@ -281,7 +281,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Статистика */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           <div className="bg-[#1a1a1d] p-4 rounded-xl">
             <p className="text-sm text-gray-400 flex items-center">
               <Timer className="w-4 h-4 mr-1" /> Total Training
@@ -313,7 +313,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Графики и таблицы */}
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-6">
             <TrainingLoadChart workouts={filteredWorkouts} />
             <IntensityZones workouts={filteredWorkouts} />
