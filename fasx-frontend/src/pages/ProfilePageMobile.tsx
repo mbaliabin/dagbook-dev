@@ -13,337 +13,130 @@ import {
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import dayjs from 'dayjs'
-import isBetween from 'dayjs/plugin/isBetween'
-import isoWeek from 'dayjs/plugin/isoWeek'
-import 'react-date-range/dist/styles.css'
-import 'react-date-range/dist/theme/default.css'
-import { DateRange } from 'react-date-range'
-import { ru } from 'date-fns/locale'
+import { Card, CardContent } from '@/components/ui/card'
+import AddWorkoutModal from '@/features/AddWorkoutModal'
+import RecentWorkouts from '@/components/RecentWorkouts'
+import IntensityZones from '@/components/IntensityZones'
+import WeeklySessions from '@/components/WeeklySessions'
+import ActivityTable from '@/components/ActivityTable'
 
-import IntensityZones from '../components/IntensityZones'
-import TrainingLoadChart from "../components/TrainingLoadChart"
-import WeeklySessions from "../components/WeeklySessions"
-import RecentWorkouts from "../components/RecentWorkouts"
-import ActivityTable from "../components/ActivityTable"
-import AddWorkoutModal from "../components/AddWorkoutModal"
-import { getUserProfile } from "../api/getUserProfile"
-import TopSessions from "../components/TopSessions"
-
-dayjs.extend(isBetween)
-dayjs.extend(isoWeek)
-
-interface Workout {
-  id: string
-  name: string
-  date: string
-  duration: number
-  type: string
-  distance?: number | null
-  zone1Min?: number
-  zone2Min?: number
-  zone3Min?: number
-  zone4Min?: number
-  zone5Min?: number
-}
-
-export default function ProfilePage() {
-  const [name, setName] = useState("")
-  const [loadingProfile, setLoadingProfile] = useState(true)
-  const [workouts, setWorkouts] = useState<Workout[]>([])
-  const [loadingWorkouts, setLoadingWorkouts] = useState(true)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [selectedMonth, setSelectedMonth] = useState(dayjs())
-  const [dateRange, setDateRange] = useState<{ startDate: Date; endDate: Date } | null>({
-    startDate: dayjs().startOf('isoWeek').toDate(),
-    endDate: dayjs().endOf('isoWeek').toDate()
-  })
-  const [showDateRangePicker, setShowDateRangePicker] = useState(false)
+const ProfilePage = () => {
   const navigate = useNavigate()
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false)
+  const [stats, setStats] = useState<any[]>([])
+  const [currentDate, setCurrentDate] = useState(dayjs())
 
-  const fetchWorkouts = useCallback(async () => {
-    try {
-      const token = localStorage.getItem('token')
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/workouts/user`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!res.ok) throw new Error("Ошибка загрузки тренировок")
-      const data: Workout[] = await res.json()
-      setWorkouts(data)
-    } catch (err) {
-      console.error("Ошибка:", err)
-    } finally {
-      setLoadingWorkouts(false)
-    }
+  const fetchStats = useCallback(async () => {
+    // пример заглушки
+    setStats([
+      { label: 'Время', value: '12 ч', icon: Timer },
+      { label: 'Расстояние', value: '85 км', icon: MapPin },
+      { label: 'Интенсивные', value: '5', icon: Zap },
+      { label: 'Сессии', value: '8', icon: Target }
+    ])
   }, [])
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const data = await getUserProfile()
-        setName(data.name || "Пользователь")
-      } catch (err) {
-        console.error("Ошибка профиля:", err)
-      } finally {
-        setLoadingProfile(false)
-      }
-    }
-    fetchProfile()
-    fetchWorkouts()
-  }, [fetchWorkouts])
-
-  const handleAddWorkout = (w: Workout) => {
-    setWorkouts(prev => [w, ...prev])
-  }
-
-  const handleDeleteWorkout = (id: string) => {
-    setWorkouts(prev => prev.filter(w => w.id !== id))
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    navigate('/')
-  }
-
-  const filteredWorkouts = workouts.filter(w => {
-    const workoutDate = dayjs(w.date)
-    if (dateRange) {
-      const start = dayjs(dateRange.startDate).startOf('day')
-      const end = dayjs(dateRange.endDate).endOf('day')
-      return workoutDate.isBetween(start, end, null, '[]')
-    }
-    return workoutDate.isSame(selectedMonth, 'month')
-  })
-
-  const totalDuration = filteredWorkouts.reduce((sum, w) => sum + w.duration, 0)
-  const totalDistance = filteredWorkouts.reduce((sum, w) => sum + (w.distance || 0), 0)
-  const hours = Math.floor(totalDuration / 60)
-  const minutes = totalDuration % 60
-  const totalTimeStr = `${hours}:${minutes.toString().padStart(2, '0')}`
-
-  const intensiveSessions = filteredWorkouts.filter(w => {
-    const zones = [
-      w.zone1Min || 0,
-      w.zone2Min || 0,
-      w.zone3Min || 0,
-      w.zone4Min || 0,
-      w.zone5Min || 0
-    ]
-    const maxZone = zones.indexOf(Math.max(...zones)) + 1
-    return [3, 4, 5].includes(maxZone)
-  }).length
-
-  const onPrevMonth = () => {
-    setSelectedMonth(prev => prev.subtract(1, 'month'))
-    setDateRange(null)
-  }
-
-  const onNextMonth = () => {
-    setSelectedMonth(prev => prev.add(1, 'month'))
-    setDateRange(null)
-  }
-
-  const applyDateRange = () => {
-    if (dateRange) {
-      setShowDateRangePicker(false)
-    }
-  }
+    fetchStats()
+  }, [fetchStats])
 
   return (
     <div className="min-h-screen bg-[#0e0e10] text-white px-2 sm:px-4 py-6 overflow-x-hidden">
       <div className="w-full max-w-7xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          <div className="flex items-center space-x-4">
+          {/* Профиль */}
+          <div className="flex items-center space-x-3">
             <img
-              src="/profile.jpg"
-              alt="Avatar"
-              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full object-cover"
+              src="/profile-pic.png"
+              alt="Profile"
+              className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-gray-700"
             />
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-white">
-                {loadingProfile ? 'Загрузка...' : name}
-              </h1>
-              <p className="text-xs sm:text-sm text-white">
-                {!dateRange
-                  ? selectedMonth.format('MMMM YYYY')
-                  : `${dayjs(dateRange.startDate).format('DD MMM YYYY')} — ${dayjs(dateRange.endDate).format('DD MMM YYYY')}`
-                }
-              </p>
+              <h1 className="text-lg sm:text-2xl font-bold">Мой профиль</h1>
+              <p className="text-xs sm:text-sm text-gray-400">Добро пожаловать!</p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          {/* Кнопки */}
+          <div className="flex flex-wrap items-center gap-2">
             <button
-              onClick={() => setIsModalOpen(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded flex items-center justify-center"
+              onClick={() => setIsAddModalOpen(true)}
+              className="flex items-center px-3 sm:px-4 py-1.5 bg-[#1c1c1e] rounded-xl shadow hover:bg-[#2a2a2d] transition"
             >
-              <Plus className="w-4 h-4 mr-1" /> Добавить тренировку
+              <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5" />
+              <span className="text-xs sm:text-sm">Добавить тренировку</span>
             </button>
+
             <button
-              onClick={handleLogout}
-              className="bg-blue-600 hover:bg-blue-700 text-white text-sm px-3 py-2 rounded flex items-center justify-center"
+              onClick={() => {
+                localStorage.removeItem('token')
+                navigate('/login')
+              }}
+              className="flex items-center px-3 sm:px-4 py-1.5 bg-red-600 rounded-xl shadow hover:bg-red-700 transition"
             >
-              <LogOut className="w-4 h-4 mr-1" /> Выйти
+              <LogOut className="w-4 h-4 sm:w-5 sm:h-5 mr-1.5" />
+              <span className="text-xs sm:text-sm">Выйти</span>
             </button>
           </div>
         </div>
 
         {/* Выбор периода */}
-        <div className="flex flex-wrap items-center gap-2">
-          <button
-            className="flex items-center text-sm text-gray-300 bg-[#1f1f22] px-2 py-1 rounded hover:bg-[#2a2a2d]"
-            onClick={onPrevMonth}
-          >
-            <ChevronLeft className="w-4 h-4" />
-          </button>
-
-          <div
-            className="relative bg-[#1f1f22] text-white px-3 py-1 rounded text-sm flex items-center gap-1 cursor-pointer select-none"
-            onClick={() => {
-              setShowDateRangePicker(false)
-              setDateRange(null)
-            }}
-            title="Показать текущий месяц"
-          >
-            {selectedMonth.format('MMMM YYYY')}
-          </div>
-
-          <button
-            className="text-sm text-gray-300 bg-[#1f1f22] px-2 py-1 rounded hover:bg-[#2a2a2d]"
-            onClick={onNextMonth}
-          >
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-          <button
-            onClick={() => {
-              setDateRange({
-                startDate: dayjs().startOf('isoWeek').toDate(),
-                endDate: dayjs().endOf('isoWeek').toDate()
-              })
-              setShowDateRangePicker(false)
-            }}
-            className="text-sm px-3 py-1 rounded border border-gray-600 bg-[#1f1f22] text-gray-300 hover:bg-[#2a2a2d]"
-          >
-            Текущая неделя
-          </button>
-
-          <div className="relative">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
             <button
-              onClick={() => setShowDateRangePicker(prev => !prev)}
-              className="text-sm px-3 py-1 rounded border border-gray-600 bg-[#1f1f22] text-gray-300 hover:bg-[#2a2a2d] flex items-center"
+              onClick={() => setCurrentDate(currentDate.subtract(1, 'month'))}
+              className="p-1 hover:bg-[#1c1c1e] rounded-lg"
             >
-              <Calendar className="w-4 h-4 mr-1" />
-              Произвольный период
-              <ChevronDown className="w-4 h-4 ml-1" />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
-
-            {showDateRangePicker && (
-              <div className="absolute z-50 mt-2 bg-[#1a1a1d] rounded shadow-lg p-2">
-                <DateRange
-                  onChange={item =>
-                    setDateRange({
-                      startDate: item.selection.startDate,
-                      endDate: item.selection.endDate
-                    })
-                  }
-                  showSelectionPreview={true}
-                  moveRangeOnFirstSelection={false}
-                  months={1}
-                  ranges={[{
-                    startDate: dateRange?.startDate || new Date(),
-                    endDate: dateRange?.endDate || new Date(),
-                    key: 'selection'
-                  }]}
-                  direction="horizontal"
-                  rangeColors={['#3b82f6']}
-                  className="text-white"
-                  locale={ru}
-                  weekStartsOn={1}
-                />
-                <div className="flex justify-end mt-2 space-x-2">
-                  <button
-                    onClick={() => setShowDateRangePicker(false)}
-                    className="px-3 py-1 rounded border border-gray-600 hover:bg-gray-700 text-gray-300"
-                  >
-                    Отмена
-                  </button>
-                  <button
-                    onClick={applyDateRange}
-                    className="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    Применить
-                  </button>
-                </div>
-              </div>
-            )}
+            <span className="text-sm sm:text-base font-semibold">
+              {currentDate.format('MMMM YYYY')}
+            </span>
+            <button
+              onClick={() => setCurrentDate(currentDate.add(1, 'month'))}
+              className="p-1 hover:bg-[#1c1c1e] rounded-lg"
+            >
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </button>
+            <button className="flex items-center px-2 sm:px-3 py-1 bg-[#1c1c1e] rounded-xl text-xs sm:text-sm hover:bg-[#2a2a2d] transition">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+              Произвольный период
+              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
+            </button>
           </div>
         </div>
 
         {/* Статистика */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-[#1a1a1d] p-4 rounded-xl">
-            <p className="text-sm text-gray-400 flex items-center">
-              <Timer className="w-4 h-4 mr-1" /> Total Training
-            </p>
-            <h2 className="text-xl font-semibold">{totalTimeStr}</h2>
-            <p className="text-xs text-gray-500">{filteredWorkouts.length} Sessions</p>
-          </div>
-          <div className="bg-[#1a1a1d] p-4 rounded-xl">
-            <p className="text-sm text-gray-400 flex items-center">
-              <MapPin className="w-4 h-4 mr-1" /> Distance
-            </p>
-            <h2 className="text-xl font-semibold">{totalDistance.toFixed(1)} km</h2>
-            <p className="text-xs text-gray-500">
-              {filteredWorkouts.filter(w => w.distance).length} Sessions
-            </p>
-          </div>
-          <div className="bg-[#1a1a1d] p-4 rounded-xl">
-            <p className="text-sm text-gray-400 flex items-center">
-              <Zap className="w-4 h-4 mr-1" /> Intensive
-            </p>
-            <h2 className="text-xl font-semibold">{intensiveSessions}</h2>
-          </div>
-          <div className="bg-[#1a1a1d] p-4 rounded-xl">
-            <p className="text-sm text-gray-400 flex items-center">
-              <Target className="w-4 h-4 mr-1" /> Specific
-            </p>
-            <h2 className="text-xl font-semibold">1</h2>
-          </div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+          {stats.map((stat, idx) => (
+            <Card key={idx} className="bg-[#1c1c1e] rounded-2xl shadow-lg p-3 sm:p-6">
+              <CardContent className="flex flex-col items-center">
+                <stat.icon className="w-4 h-4 sm:w-5 sm:h-5 text-[#9ca3af]" />
+                <div className="text-lg sm:text-2xl font-bold">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-gray-400">{stat.label}</div>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Графики и таблицы */}
+        {/* Графики + таблица */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <TrainingLoadChart workouts={filteredWorkouts} />
-            <IntensityZones workouts={filteredWorkouts} />
-          </div>
-          <div className="space-y-6">
-            <TopSessions workouts={filteredWorkouts} />
-            <ActivityTable workouts={filteredWorkouts} />
-          </div>
+          <IntensityZones />
+          <WeeklySessions />
         </div>
 
-        {/* Список тренировок */}
-        <div>
-          {loadingWorkouts ? (
-            <p className="text-gray-400">Загрузка тренировок...</p>
-          ) : (
-            <RecentWorkouts
-              workouts={filteredWorkouts}
-              onDeleteWorkout={handleDeleteWorkout}
-              onUpdateWorkout={fetchWorkouts}
-            />
-          )}
-        </div>
+        <ActivityTable />
+
+        {/* Недавние тренировки */}
+        <RecentWorkouts />
+
+        {/* Модалка */}
+        <AddWorkoutModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
       </div>
-
-      {/* Модалка */}
-      <AddWorkoutModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAddWorkout={handleAddWorkout}
-      />
     </div>
   )
 }
+
+export default ProfilePage
+
