@@ -1,3 +1,4 @@
+console.log("ProfilePageMobile загружен")
 import React from "react"
 import { Timer, MapPin, Zap, Target, Plus, LogOut } from "lucide-react"
 import TrainingLoadChartMobile from "../components/TrainingLoadChartMobile"

@@ -1,3 +1,4 @@
+console.log("ProfilePage загружен")
 import React, { useEffect, useState, useCallback } from 'react'
 import {
   Timer,
