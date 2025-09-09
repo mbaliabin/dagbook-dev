@@ -1,7 +1,56 @@
 import React from "react"
 import { Timer, MapPin, Zap, Target, Plus, LogOut } from "lucide-react"
 
+interface Workout {
+  zone1Min?: number
+  zone2Min?: number
+  zone3Min?: number
+  zone4Min?: number
+  zone5Min?: number
+}
+
+interface IntensityZonesMobileProps {
+  workouts: Workout[]
+}
+
+function IntensityZonesMobile({ workouts }: IntensityZonesMobileProps) {
+  // Суммируем минуты по зонам
+  const totalZones = [0, 0, 0, 0, 0]
+  workouts.forEach(w => {
+    totalZones[0] += w.zone1Min || 0
+    totalZones[1] += w.zone2Min || 0
+    totalZones[2] += w.zone3Min || 0
+    totalZones[3] += w.zone4Min || 0
+    totalZones[4] += w.zone5Min || 0
+  })
+
+  const colors = ["#3b82f6", "#60a5fa", "#93c5fd", "#facc15", "#f87171"]
+
+  return (
+    <div className="flex gap-1 overflow-x-auto mt-2">
+      {totalZones.map((minutes, i) => (
+        <div key={i} className="flex flex-col items-center min-w-[40px]">
+          <div
+            className="w-6 rounded-full mb-1"
+            style={{
+              height: `${Math.min(minutes, 60)}px`, // пропорциональная высота
+              backgroundColor: colors[i]
+            }}
+          />
+          <span className="text-xs text-gray-300">I{i + 1}</span>
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function ProfilePageMobile() {
+  // Пример данных
+  const workouts: Workout[] = [
+    { zone1Min: 10, zone2Min: 20, zone3Min: 15, zone4Min: 5, zone5Min: 0 },
+    { zone1Min: 5, zone2Min: 15, zone3Min: 20, zone4Min: 10, zone5Min: 5 },
+  ]
+
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white p-4 flex flex-col gap-4">
       {/* Шапка */}
@@ -53,6 +102,9 @@ export default function ProfilePageMobile() {
         </div>
       </div>
 
+      {/* Intensity Zones мобильная версия */}
+      <IntensityZonesMobile workouts={workouts} />
+
       {/* Последние тренировки */}
       <div className="bg-[#1a1a1a] rounded-xl p-3 flex flex-col gap-2">
         <h3 className="text-sm font-semibold">Недавние тренировки</h3>
@@ -74,6 +126,7 @@ export default function ProfilePageMobile() {
     </div>
   )
 }
+
 
 
 
