@@ -1,10 +1,10 @@
 import React from "react"
 import { Timer, MapPin, Zap, Target, Plus, LogOut } from "lucide-react"
 
-export default function MobileProfilePage() {
+export default function ProfilePageMobile() {
   return (
     <div className="min-h-screen bg-[#0d0d0d] text-white p-4 flex flex-col gap-4">
-      {/* Шапка профиля */}
+      {/* Шапка */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <img
@@ -74,6 +74,7 @@ export default function MobileProfilePage() {
     </div>
   )
 }
+
 
 
 
