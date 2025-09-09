@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import ProfilePage from './ProfilePage';
-import ProfilePageMobile from './ProfilePageMobile';
+import React, { useState, useEffect } from "react";
+import ProfilePage from "./ProfilePage";
+import ProfilePageMobile from "./ProfilePageMobile";
 
 export default function ProfilePageWrapper() {
-  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isMobile, setIsMobile] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const checkWidth = () => setIsMobile(window.innerWidth <= 768);
+
+    checkWidth(); // проверка при монтировании
+    window.addEventListener("resize", checkWidth);
+
+    return () => window.removeEventListener("resize", checkWidth);
   }, []);
+
+  if (isMobile === null) return null; // пока не определили ширину, ничего не рендерим
 
   return isMobile ? <ProfilePageMobile /> : <ProfilePage />;
 }
+
