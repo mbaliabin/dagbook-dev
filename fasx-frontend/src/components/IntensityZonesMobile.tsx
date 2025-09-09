@@ -1,4 +1,3 @@
-// src/components/IntensityZonesMobile.tsx
 import React, { useMemo } from "react";
 
 interface Workout {
@@ -40,13 +39,13 @@ export default function IntensityZonesMobile({ workouts }: Props) {
   }, [workouts]);
 
   return (
-    <div className="bg-[#1a1a1d] p-3 rounded-xl text-white overflow-x-auto">
+    <div className="bg-[#1a1a1d] p-3 rounded-xl text-white">
       <h2 className="text-sm font-semibold mb-2">Intensity Zones</h2>
-      <div className="flex gap-2 min-w-max">
+      <div className="flex justify-between gap-1">
         {totals.map((zone, idx) => (
-          <div key={idx} className="flex flex-col items-center min-w-[40px]">
+          <div key={idx} className="flex flex-col items-center flex-1">
             <div
-              className="w-4 rounded mb-1 transition-all duration-700"
+              className="w-full rounded mb-1 transition-all duration-700"
               style={{
                 height: `${Math.min(zone.time, 60)}px`,
                 backgroundColor: zone.color,
@@ -60,3 +59,5 @@ export default function IntensityZonesMobile({ workouts }: Props) {
     </div>
   );
 }
+
+
